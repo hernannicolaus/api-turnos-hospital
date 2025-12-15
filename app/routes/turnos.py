@@ -1,11 +1,15 @@
-from fastapi import APIRouter, HTTPException
+from datetime import datetime
+from typing import Optional
+
+from fastapi import APIRouter, HTTPException, Query
 
 from app.models.schemas import (
     Paciente, PacienteCrear,
     Profesional, ProfesionalCrear,
-    Turno, TurnoCrear
+    Turno, TurnoCrear, EstadoTurno
 )
 from app.services.store import store
+
 
 router = APIRouter()
 
@@ -29,8 +33,14 @@ def crear_turno(data: TurnoCrear):
         raise HTTPException(status_code=400, detail=str(e))
 
 @router.get("/turnos", response_model=list[Turno])
-def listar_turnos():
-    return store.listar_turnos()
+def listar_turnos(
+    desde: Optional[datetime] = Query(default=None),
+    hasta: Optional[datetime] = Query(default=None),
+    profesional_id: Optional[int] = Query(default=None),
+    estado: Optional[EstadoTurno] = Query(default=None),
+):
+    return store.listar_turnos(desde=desde, hasta=hasta, profesional_id=profesional_id, estado=estado)
+
 
 @router.patch("/turnos/{turno_id}/cancelar", response_model=Turno)
 def cancelar_turno(turno_id: int):

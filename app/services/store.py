@@ -67,8 +67,30 @@ class Store:
         self._turnos.append(turno)
         return turno
 
-    def listar_turnos(self) -> List[Turno]:
-        return self._turnos
+    def listar_turnos(
+        self,
+        desde: Optional[datetime] = None,
+        hasta: Optional[datetime] = None,
+        profesional_id: Optional[int] = None,
+        estado: Optional[EstadoTurno] = None,
+    ) -> List[Turno]:
+        # Filtra por fecha de inicio
+        resultados = self._turnos
+        if desde:
+            resultados = [t for t in resultados if t.inicio >= desde]
+        if hasta:
+            resultados = [t for t in resultados if t.inicio <= hasta]
+        
+        # Filtra por ID de profesional
+        if profesional_id:
+            resultados = [t for t in resultados if t.profesional_id == profesional_id]
+
+        # Filtra por estado
+        if estado:
+            resultados = [t for t in resultados if t.estado == estado]
+
+        return resultados
+
 
     def cancelar_turno(self, turno_id: int) -> Turno:
         turno = next((t for t in self._turnos if t.id == turno_id), None)
